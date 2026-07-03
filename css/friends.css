@@ -1,0 +1,1 @@
+.friend-search{display:grid;grid-template-columns:1fr auto;gap:10px;margin-bottom:16px}.friend-search input{border:1px solid var(--line);background:rgba(0,0,0,.28);color:white;border-radius:12px;padding:12px}.feature-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}

@@ -1,0 +1,9 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="g" x1="0" y1="0" x2="320" y2="320"><stop stop-color="#bde0fe"/><stop offset="1" stop-color="#8b001f"/></linearGradient><filter id="glow"><feGaussianBlur stdDeviation="5"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect x="28" y="28" width="264" height="264" rx="82" stroke="url(#g)" stroke-width="12" filter="url(#glow)"/>
+<path d="M160 8 178 45 218 51 189 79 196 119 160 100 124 119 131 79 102 51 142 45 160 8Z" fill="#bde0fe"/>
+<path d="M55 214 68 240 97 244 76 264 81 294 55 280 29 294 34 264 13 244 42 240 55 214Z" fill="#8b001f"/>
+<path d="M265 214 278 240 307 244 286 264 291 294 265 280 239 294 244 264 223 244 252 240 265 214Z" fill="#bde0fe"/>
+<circle cx="50" cy="96" r="12" fill="#bde0fe"/><circle cx="270" cy="96" r="12" fill="#8b001f"/>
+<text x="160" y="286" text-anchor="middle" fill="white" opacity=".75" font-size="20" font-weight="900" font-family="Arial">moon</text>
+</svg>

@@ -1,0 +1,11 @@
+<svg width="360" height="320" viewBox="0 0 360 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="r" x1="90" y1="40" x2="280" y2="300"><stop stop-color="#ff8fa3"/><stop offset=".5" stop-color="#ff174e"/><stop offset="1" stop-color="#7a0019"/></linearGradient><filter id="g"><feGaussianBlur stdDeviation="5"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<ellipse cx="180" cy="292" rx="112" ry="18" fill="#ff174e" opacity=".22"/>
+<rect x="86" y="74" width="188" height="150" rx="52" fill="#140812" stroke="#ff174e" stroke-width="5" filter="url(#g)"/>
+<path d="M122 78 104 42M238 78l18-36" stroke="#ff174e" stroke-width="8" stroke-linecap="round"/>
+<circle cx="102" cy="39" r="11" fill="url(#r)"/><circle cx="258" cy="39" r="11" fill="url(#r)"/>
+<circle cx="142" cy="145" r="18" fill="#ff174e"/><circle cx="218" cy="145" r="18" fill="#ff174e"/>
+<circle cx="142" cy="145" r="7" fill="#fff"/><circle cx="218" cy="145" r="7" fill="#fff"/>
+<path d="M158 184c16 12 36 12 52 0" stroke="#ff8fa3" stroke-width="6" stroke-linecap="round"/>
+<path d="M122 224h116l28 70H94l28-70Z" fill="url(#r)" stroke="#ff8fa3" stroke-width="4"/>
+</svg>

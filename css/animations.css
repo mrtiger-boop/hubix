@@ -1,0 +1,1 @@
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@keyframes stars{to{background-position:210px 210px}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 10px rgba(255,23,78,.4))}50%{filter:drop-shadow(0 0 22px rgba(255,23,78,.8))}}.animated-frame{animation:glowPulse 2.4s infinite}
