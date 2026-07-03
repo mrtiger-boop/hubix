@@ -1,0 +1,9 @@
+<svg width="340" height="240" viewBox="0 0 340 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="170" cy="214" rx="105" ry="14" fill="#ff174e" opacity=".18"/>
+<rect x="95" y="54" width="150" height="112" rx="32" fill="#15101a" stroke="#ff174e" stroke-width="5"/>
+<circle cx="140" cy="106" r="14" fill="#ff174e"/><circle cx="200" cy="106" r="14" fill="#ff174e"/>
+<path d="M150 139c12 8 28 8 40 0" stroke="#ff8fa3" stroke-width="6" stroke-linecap="round"/>
+<path d="M118 54 105 24M222 54l13-30" stroke="#ff174e" stroke-width="7" stroke-linecap="round"/>
+<circle cx="104" cy="22" r="9" fill="#ff8fa3"/><circle cx="236" cy="22" r="9" fill="#ff8fa3"/>
+<text x="72" y="200" fill="#ff8fa3" font-size="22" font-weight="900" font-family="Arial">Crée ton premier serveur</text>
+</svg>

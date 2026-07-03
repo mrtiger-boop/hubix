@@ -1,0 +1,6 @@
+<svg width="320" height="260" viewBox="0 0 320 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="r" x1="70" y1="20" x2="260" y2="230"><stop stop-color="#ff8fa3"/><stop offset=".45" stop-color="#ff174e"/><stop offset="1" stop-color="#520014"/></linearGradient><filter id="g"><feGaussianBlur stdDeviation="7"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<ellipse cx="160" cy="226" rx="110" ry="18" fill="#ff174e" opacity=".24"/><path d="M160 16 230 74 205 205 160 238 115 205 90 74l70-58Z" fill="url(#r)" filter="url(#g)"/>
+<path d="M82 92 32 132 60 216 116 207l-34-115Z" fill="url(#r)" opacity=".82"/><path d="M238 86 292 126 260 218 204 205l34-119Z" fill="url(#r)" opacity=".82"/>
+<path d="M160 16v222M90 74h140M115 205 160 74l45 131" stroke="white" opacity=".34" stroke-width="3"/>
+</svg>

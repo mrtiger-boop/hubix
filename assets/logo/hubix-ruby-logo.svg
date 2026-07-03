@@ -1,0 +1,6 @@
+<svg width="260" height="86" viewBox="0 0 260 86" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="r" x1="0" y1="0" x2="90" y2="90"><stop stop-color="#ff8fa3"/><stop offset=".35" stop-color="#ff174e"/><stop offset="1" stop-color="#700017"/></linearGradient><filter id="g"><feGaussianBlur stdDeviation="5"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+<rect x="8" y="10" width="66" height="66" rx="20" fill="url(#r)" filter="url(#g)"/><path d="M25 58V28h11v11h10V28h11v30H46V47H36v11H25Z" fill="white"/>
+<path d="m39 6 6 12 13 2-10 9 3 13-12-7-12 7 3-13-10-9 13-2 6-12Z" fill="#ff8fa3"/>
+<text x="92" y="55" font-size="42" font-weight="900" fill="white" font-family="Arial">Hubix</text><path d="M94 66h112" stroke="#ff174e" stroke-width="4" stroke-linecap="round"/>
+</svg>

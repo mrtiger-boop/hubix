@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Hubix v3.0</title>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="ruby-bg"></div><div class="ruby-grid"></div><div class="ruby-stars"></div>
+
+<aside class="sidebar">
+<button class="menu-toggle" id="menuToggle">☰</button>
+<div class="side-logo">H</div>
+<nav class="icon-nav">
+<button class="active" data-page="home">🏠</button>
+<button data-page="match">💎</button>
+<button data-page="world">🌍</button>
+<button data-page="friends">👥</button>
+<button data-page="shop">🎁</button>
+<button data-page="profile">👤</button>
+<button data-page="settings">⚙️</button>
+</nav>
+</aside>
+
+<div class="nav-popover" id="navPopover">
+<button class="active" data-page="home">🏠 Accueil</button>
+<button data-page="match">💎 Rencontre</button>
+<button data-page="world">🌍 Chat mondial</button>
+<button data-page="friends">👥 Amis</button>
+<button data-page="shop">🎁 Boutique</button>
+<button data-page="profile">👤 Profil</button>
+<button data-page="settings">⚙️ Réglages</button>
+</div>
+
+<main class="main">
+<header class="topbar">
+<div class="search"><span>⌕</span><input placeholder="Rechercher sur Hubix..."/><kbd>Ctrl K</kbd></div>
+<div class="top-actions">
+<button class="chip">🟢 <span id="globalOnlineCount">0</span> en ligne</button>
+<button class="chip">💎 <span id="coinAmount">2 500</span></button>
+<button class="light auth-guest" data-page="login">Connexion</button>
+<button class="primary auth-guest" data-page="register">Créer un compte</button>
+<div class="top-user"><div id="miniAvatar">?</div><span id="miniPseudo">Invité</span></div>
+</div>
+</header>
+
+<section id="home" class="page active">
+<div class="home">
+<div class="hero">
+<div>
+<span class="tag">Hubix v3.0 Clean</span>
+<h1>Rencontre de vrais utilisateurs en un clic.</h1>
+<p>Code refait proprement pour corriger la connexion, le profil et le bug “Invité”.</p>
+<div class="actions">
+<button class="primary big" data-page="match">💎 Trouver quelqu’un</button>
+<button class="light" data-page="world">Chat mondial</button>
+<button class="light" data-page="shop">Boutique</button>
+</div>
+</div>
+<img src="assets/illustrations/hubix-ruby-h.svg" alt="Hubix"/>
+</div>
+
+<div class="stats">
+<article><strong id="homeOnline">0</strong><span>personnes en ligne</span></article>
+<article><strong id="homeMatches">0</strong><span>rencontres faites</span></article>
+<article><strong id="homeFriends">0</strong><span>amis ajoutés</span></article>
+<article><strong id="homeFrames">0</strong><span>cadres possédés</span></article>
+</div>
+
+<div class="panels">
+<div class="panel"><h2>Mode actuel</h2><p id="onlineModeText">Chargement...</p><button class="primary full" data-page="match">Démarrer</button></div>
+<div class="panel"><h2>Activité</h2><div id="homeActivity"><p class="muted">Aucune rencontre pour l’instant.</p></div></div>
+<div class="panel"><h2>Profil rapide</h2><div class="profile-mini"><div class="profile-frame" id="miniProfileFrame"><div class="avatar big" id="miniProfileInitial">?</div></div><div><b id="miniProfileName">Invité</b><small id="miniProfileStatus">Non connecté</small></div></div><button class="light full" data-page="profile">Ouvrir le profil</button></div>
+</div>
+</div>
+</section>
+
+<section id="login" class="page">
+<div class="auth-shell">
+<div class="card">
+<span class="tag">Connexion</span>
+<h1>Connexion</h1>
+<label>Pseudo ou email</label><input id="loginIdentifier" placeholder="Pseudo ou email"/>
+<label>Mot de passe</label><input id="loginPassword" type="password" placeholder="Mot de passe"/>
+<button class="primary full" id="loginBtn">Se connecter</button>
+<div class="message" id="loginMessage"></div>
+<p>Pas de compte ? <button class="link" data-page="register">Créer un compte</button></p>
+</div>
+<div class="card"><h2>Correction v3.0</h2><p>Le profil est récupéré après connexion, donc le pseudo ne doit plus rester en Invité.</p></div>
+</div>
+</section>
+
+<section id="register" class="page">
+<div class="auth-shell">
+<div class="card">
+<span class="tag">Inscription</span>
+<h1>Créer un compte</h1>
+<div class="register-avatar-box">
+<div class="profile-frame"><div class="avatar-xl" id="registerAvatarPreview">?</div></div>
+<label class="upload-btn">📷 Ajouter une photo<input id="registerAvatar" type="file" accept="image/*"/></label>
+</div>
+<label>Pseudo</label><input id="registerPseudo" placeholder="Ex : MrTiger"/>
+<label>Email</label><input id="registerEmail" type="email" placeholder="email@example.com"/>
+<label>Mot de passe</label><input id="registerPassword" type="password" placeholder="Minimum 4 caractères"/>
+<div class="row"><div><label>Âge</label><input id="registerAge" type="number" min="18" max="99" value="18"/></div><div><label>Pays</label><input id="registerCountry" value="France"/></div></div>
+<label>Bio</label><textarea id="registerBio" placeholder="Présente-toi..."></textarea>
+<button class="primary full" id="registerBtn">Créer mon compte</button>
+<div class="message" id="registerMessage"></div>
+</div>
+<div class="card"><h2>Profil Hubix</h2><p>Photo, pseudo, âge, pays et bio.</p></div>
+</div>
+</section>
+
+<section id="match" class="page">
+<div class="match-layout">
+<aside class="filters">
+<span class="tag">Préférences</span>
+<h1>Recherche</h1>
+<label>Je souhaite parler avec</label>
+<div class="choice" id="genderChoices"><button data-value="Homme">👨 Homme</button><button data-value="Femme">👩 Femme</button><button data-value="Peu importe" class="active">🌍 Peu importe</button></div>
+<label>Tranche d’âge</label>
+<div class="choice age" id="ageChoices"><button data-value="18-20">18-20</button><button data-value="21-23">21-23</button><button data-value="24-26">24-26</button><button data-value="27-30">27-30</button><button data-value="31-35">31-35</button><button data-value="36-40">36-40</button><button data-value="41-45">41-45</button><button data-value="46-50">46-50</button><button data-value="51-55">51-55</button><button data-value="56-60">56-60</button><button data-value="61-65">61-65</button><button data-value="66-70">66-70</button><button data-value="71+">71+</button><button data-value="Peu importe" class="active">Tous</button></div>
+<div class="row"><div><label>Pays</label><select id="countryFilter"><option>France</option><option>Belgique</option><option>Suisse</option><option>Canada</option><option>Monde entier</option></select></div><div><label>Langue</label><select id="languageFilter"><option>Français</option><option>English</option><option>Español</option></select></div></div>
+</aside>
+
+<section class="match-main">
+<div class="match-idle" id="matchIdle"><img src="assets/illustrations/match-robot.svg"/><h1>💎 Trouver quelqu’un</h1><p>Hubix cherche uniquement des vrais profils.</p><button class="primary huge" id="startMatchBtn">Lancer la recherche</button></div>
+<div class="search-screen hidden" id="searchScreen"><div class="loader"></div><h2 id="searchStep">Recherche...</h2><p>Analyse des préférences.</p></div>
+<div class="match-result hidden" id="matchResult">
+<div class="match-profile"><div class="profile-frame match-frame" id="matchFrame"><div class="avatar-xl" id="matchedInitial">?</div></div><div><span class="tag" id="compatibilityBadge">Compatibilité 0%</span><h1 id="matchedName">Pseudo</h1><p id="matchedMeta">Âge • Pays • Langue</p><p id="matchedBio">Bio</p><div class="chips" id="matchedInterests"></div><div class="match-actions"><button class="primary" id="addFriendFromMatch">❤️ Ajouter</button><button class="light" id="favoriteMatch">⭐ Favori</button><button class="light" id="nextMatchBtn">➡️ Passer</button><button class="light danger" id="blockMatch">🚫 Bloquer</button><button class="light danger" id="reportMatch">⚠️ Signaler</button></div></div></div>
+<div class="chat"><div class="chat-header"><strong id="privateChatTitle">Conversation</strong></div><div class="chat-body" id="privateMessages"></div><div class="emoji-panel hidden" id="emojiPanel"></div><div class="chat-input"><button id="emojiBtn">😊</button><label class="image-chat-btn">📷<input id="privateImageInput" type="file" accept="image/*"/></label><input id="privateInput" placeholder="Écrire un message..."/><button id="sendPrivateMessage">Envoyer</button></div></div>
+</div>
+</section>
+</div>
+</section>
+
+<section id="world" class="page">
+<div class="page-head"><span class="tag">Chat mondial</span><h1>Chat mondial</h1></div>
+<div class="language-list"><button class="lang active" data-lang="Français">🇫🇷 Français</button><button class="lang" data-lang="English">🇬🇧 English</button><button class="lang" data-lang="Español">🇪🇸 Español</button></div>
+<div class="world-grid"><div class="world-server active" data-server="1"><strong id="worldOne">Français #1</strong><span>248 en ligne</span></div><div class="world-server" data-server="2"><strong id="worldTwo">Français #2</strong><span>156 en ligne</span></div><div class="world-server" data-server="3"><strong id="worldThree">Français #3</strong><span>91 en ligne</span></div></div>
+<div class="chat card world-chat"><div class="chat-header"><strong id="worldTitle">🌍 Français #1</strong></div><div class="chat-body" id="worldMessages"></div><div class="chat-input"><input id="worldInput" placeholder="Message mondial..."/><button id="sendWorldBtn">Envoyer</button></div></div>
+</section>
+
+<section id="friends" class="page"><div class="page-head"><span class="tag">Social</span><h1>Amis</h1></div><h2>Mes amis</h2><div id="friendList" class="grid-3"></div><h2>Favoris</h2><div id="favoriteList" class="grid-3"></div><h2>Bloqués</h2><div id="blockedList" class="grid-3"></div></section>
+
+<section id="shop" class="page"><div class="page-head"><span class="tag">Cosmétiques</span><h1>Boutique</h1><p>Cadres de profil.</p></div><div class="shop-grid" id="shopGrid"></div></section>
+
+<section id="profile" class="page">
+<div class="profile-card"><div class="profile-banner"></div><div class="profile-content">
+<div class="profile-frame big-profile-frame" id="profileFrame"><div class="avatar-xl" id="profileAvatar">?</div></div>
+<h1 id="profilePseudo">Invité</h1>
+<p id="profileBio">Connecte-toi pour personnaliser ton profil Hubix.</p>
+<div class="chips" id="profileChips"></div>
+<div class="profile-stats"><article><strong id="profileMatches">0</strong><span>Rencontres</span></article><article><strong id="profileFriends">0</strong><span>Amis</span></article><article><strong id="profileLevel">1</strong><span>Niveau</span></article><article><strong id="profileXP">0</strong><span>XP</span></article></div>
+<div class="profile-edit auth-user"><h2>Modifier mon profil</h2><label>Photo</label><label class="upload-btn">📷 Changer la photo<input id="editAvatar" type="file" accept="image/*"/></label><label>Pseudo</label><input id="editPseudo"/><label>Bio</label><textarea id="editBio"></textarea><label>Âge</label><input id="editAge" type="number" min="18" max="99"/><label>Pays</label><input id="editCountry"/><label>Statut</label><select id="editStatus"><option>En ligne</option><option>Absent</option><option>Occupé</option><option>Invisible</option></select><button class="primary full" id="saveProfileBtn">Sauvegarder</button><div id="profileMessage" class="message"></div></div>
+<h2>Mes cadres</h2><div id="profileFramesList" class="profile-frames-list"></div>
+</div></div>
+</section>
+
+<section id="settings" class="page"><div class="page-head"><span class="tag">Réglages</span><h1>Paramètres</h1></div><div class="settings-grid"><div class="card"><h3>Compte</h3><input id="settingsEmail" value="invité"><button class="primary">Modifier</button></div><div class="card"><h3>Confidentialité</h3><label><input type="checkbox" checked> Apparaître en ligne</label></div><div class="card"><h3>Sécurité</h3><label><input type="checkbox" checked> Filtre anti-spam</label></div></div></section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/services/supabase-config.js"></script>
+<script src="js/services/storage.js"></script>
+<script src="js/services/supabase-service.js"></script>
+<script src="js/ui/dom.js"></script>
+<script src="js/ui/router.js"></script>
+<script src="js/auth/auth.js"></script>
+<script src="js/profile/profile.js"></script>
+<script src="js/shop/shop.js"></script>
+<script src="js/friends/friends.js"></script>
+<script src="js/match/match.js"></script>
+<script src="js/world/world.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
