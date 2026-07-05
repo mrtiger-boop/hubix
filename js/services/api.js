@@ -59,43 +59,25 @@ const API = {
     const { data, error } = await this.client.auth.signUp({ email, password });
     if (error) throw error;
     if (!data.user) throw new Error("Confirme ton email puis connecte-toi.");
-
     let avatar_url = null;
     if (avatarFile) avatar_url = await this.uploadAvatar(data.user.id, avatarFile);
-
-    const row = {
-      id: data.user.id,
-      email,
-      pseudo,
-      bio: bio || "Membre Hubix.",
-      age: Number(age) || 18,
-      country: country || "France",
-      lang: "Français",
-      gender: "Peu importe",
-      goals: ["Discuter"],
-      avatar_url
-    };
-
+    const row = { id: data.user.id, email, pseudo, bio: bio || "Membre Hubix.", age: Number(age) || 18, country: country || "France", lang: "Français", gender: "Peu importe", goals: ["Discuter"], avatar_url };
     const ins = await this.client.from("profiles").insert(row).select().maybeSingle();
     if (ins.error) throw ins.error;
-
     await this.setPresence(data.user.id, true, "register");
     return this.profile(ins.data || row);
   },
 
   async signIn({ identifier, password }) {
     let email = identifier.trim().toLowerCase();
-
     if (!email.includes("@")) {
       const r = await this.client.from("profiles").select("email").eq("pseudo", identifier.trim()).maybeSingle();
       if (r.error) throw r.error;
       if (!r.data?.email) throw new Error("Pseudo introuvable.");
       email = r.data.email;
     }
-
     const { data, error } = await this.client.auth.signInWithPassword({ email, password });
     if (error) throw error;
-
     const p = await this.getProfile(data.user.id);
     await this.setPresence(p.id, true, "login");
     return p;
@@ -107,16 +89,8 @@ const API = {
   },
 
   async updateProfile(p, file) {
-    const up = {
-      pseudo: p.pseudo,
-      bio: p.bio,
-      age: Number(p.age) || 18,
-      country: p.country || "France",
-      status: p.status || "En ligne",
-      updated_at: new Date().toISOString()
-    };
+    const up = { pseudo: p.pseudo, bio: p.bio, age: Number(p.age) || 18, country: p.country || "France", status: p.status || "En ligne", updated_at: new Date().toISOString() };
     if (file) up.avatar_url = await this.uploadAvatar(p.id, file);
-
     const r = await this.client.from("profiles").update(up).eq("id", p.id).select().maybeSingle();
     if (r.error) throw r.error;
     return this.profile(r.data);
@@ -171,15 +145,14 @@ const API = {
   },
 
   async getExistingMatch(userA, userB) {
-    const r = await this.client.from("matches").select("*").or(`and(user_a.eq.${userA},user_b.eq.${userB}),and(user_a.eq.${userB},user_b.eq.${userA})`).maybeSingle();
+    const r = await this.client.from("matches").select("*").or(`and(user_a.eq.${userA},user_b.eq.${userB}),and(user_a.eq.${userB},user_b.eq.${userA})`).limit(1);
     if (r.error) throw r.error;
-    return r.data;
+    return r.data?.[0] || null;
   },
 
   async getOrCreateMatch(userA, userB, compatibility = 85) {
     const existing = await this.getExistingMatch(userA, userB);
     if (existing) return existing;
-
     const created = await this.client.from("matches").insert({ user_a: userA, user_b: userB, compatibility, active: true }).select().maybeSingle();
     if (created.error) throw created.error;
     return created.data;
@@ -189,25 +162,17 @@ const API = {
     let query = this.client.from("profiles").select("*,presence!left(is_online)").neq("id", me.id).limit(100);
     if (prefs.gender !== "Peu importe") query = query.eq("gender", prefs.gender);
     if (prefs.country !== "Monde entier") query = query.eq("country", prefs.country);
-
     const r = await query;
     if (r.error) throw r.error;
-
     let pool = (r.data || []).map(row => {
       const p = this.profile(row);
       p.is_online = Array.isArray(row.presence) ? row.presence[0]?.is_online : row.presence?.is_online;
       p.compatibility = this.score(me, p, prefs);
       return p;
-    })
-    .filter(p => p.is_online !== false)
-    .filter(p => this.ageOk(p.age, prefs.age))
-    .sort((a, b) => b.compatibility - a.compatibility);
-
+    }).filter(p => p.is_online !== false).filter(p => this.ageOk(p.age, prefs.age)).sort((a, b) => b.compatibility - a.compatibility);
     if (!pool.length) return null;
-
     const matched = pool.slice(0, 10)[Math.floor(Math.random() * Math.min(10, pool.length))];
     const match = await this.getOrCreateMatch(me.id, matched.id, matched.compatibility);
-
     matched.match_id = match.id;
     return matched;
   },
@@ -227,22 +192,25 @@ const API = {
     return this.client.channel(`private_${matchId}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "private_messages", filter: `match_id=eq.${matchId}` }, cb).subscribe();
   },
 
+  async openFriendChat(friendId) {
+    const friend = await this.getProfile(friendId);
+    const match = await this.getOrCreateMatch(Auth.user.id, friendId, 95);
+    friend.match_id = match.id;
+    friend.compatibility = 95;
+    return friend;
+  },
+
   async sendFriendRequest(senderId, receiverId) {
     if (senderId === receiverId) throw new Error("Impossible de t'ajouter toi-même.");
-
-    const existing = await this.client.from("friend_requests").select("*").or(`and(sender_id.eq.${senderId},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${senderId})`).maybeSingle();
+    const existing = await this.client.from("friend_requests").select("*").or(`and(sender_id.eq.${senderId},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${senderId})`).limit(1);
     if (existing.error) throw existing.error;
-
-    if (existing.data) {
-      if (existing.data.status === "pending") return existing.data;
-      if (existing.data.status === "accepted") throw new Error("Vous êtes déjà amis.");
+    const found = existing.data?.[0];
+    if (found) {
+      if (found.status === "pending") return found;
+      if (found.status === "accepted") throw new Error("Vous êtes déjà amis.");
     }
-
     const created = await this.client.from("friend_requests").insert({ sender_id: senderId, receiver_id: receiverId, status: "pending" }).select().maybeSingle();
     if (created.error) throw created.error;
-
-    await this.createNotification(receiverId, "friend_request", "Nouvelle demande d'ami", "Quelqu'un veut t'ajouter sur Hubix.", { request_id: created.data.id, sender_id: senderId });
-
     return created.data;
   },
 
@@ -256,16 +224,13 @@ const API = {
     const req = await this.client.from("friend_requests").select("*").eq("id", requestId).maybeSingle();
     if (req.error) throw req.error;
     if (!req.data) throw new Error("Demande introuvable.");
-
     const update = await this.client.from("friend_requests").update({ status: "accepted", updated_at: new Date().toISOString() }).eq("id", requestId);
     if (update.error) throw update.error;
-
     await this.client.from("friends").upsert([
       { user_id: req.data.sender_id, friend_id: req.data.receiver_id },
       { user_id: req.data.receiver_id, friend_id: req.data.sender_id }
     ]);
-
-    await this.createNotification(req.data.sender_id, "friend_accepted", "Demande acceptée", "Votre demande d'ami a été acceptée.", { request_id: requestId });
+    await this.getOrCreateMatch(req.data.sender_id, req.data.receiver_id, 95);
   },
 
   async refuseFriendRequest(requestId) {
@@ -282,11 +247,6 @@ const API = {
     const r = await this.client.from(table).select(`${col}, profiles!${col}(*)`).eq("user_id", userId);
     if (r.error) return [];
     return (r.data || []).map(x => this.profile(x.profiles)).filter(Boolean);
-  },
-
-  async createNotification(userId, type, title, body = "", data = {}) {
-    const r = await this.client.from("notifications").insert({ user_id: userId, type, title, body, data });
-    if (r.error) console.warn(r.error);
   },
 
   async notifyList(uid) {
