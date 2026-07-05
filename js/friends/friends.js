@@ -48,7 +48,7 @@ const Friends = {
         <div class="card">
           <b>${person.pseudo}</b>
           <p>${person.age} ans • ${person.country}</p>
-          <button class="btn" onclick="Friends.openChat('${person.id}')">💬 Message privé</button>
+          <button class="btn" onclick="Friends.openMessages('${person.id}')">💬 Message privé</button>
           <button class="btn ghost" onclick="Friends.comingSoon('Appel audio')">📞 Audio</button>
           <button class="btn ghost" onclick="Friends.comingSoon('Appel vidéo')">🎥 Vidéo</button>
           <button class="btn ghost" onclick="Friends.comingSoon('Photo')">📷 Photo</button>
@@ -77,6 +77,7 @@ const Friends = {
   async accept(requestId) {
     await API.acceptFriendRequest(requestId);
     await this.render();
+    await Messages.renderConversations();
     alert("Demande acceptée.");
   },
 
@@ -86,10 +87,11 @@ const Friends = {
     alert("Demande refusée.");
   },
 
-  async openChat(friendId) {
+  async openMessages(friendId) {
     try {
-      const person = await API.openFriendChat(friendId);
-      await Match.open(person);
+      Router.show("messages");
+      const conversation = await API.getOrCreateFriendConversation(Auth.user.id, friendId);
+      await Messages.open(conversation.id);
     } catch (error) {
       alert(error.message || "Impossible d'ouvrir la conversation.");
     }

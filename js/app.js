@@ -1,1 +1,24 @@
-const App={async init(){API.init();Router.init();Shop.init();await Auth.init();await Presence.init();Profile.init();World.init();Match.init();Settings.init();Notifications.init();if('serviceWorker'in navigator)navigator.serviceWorker.register('/sw.js').catch(()=>null)}};document.addEventListener('DOMContentLoaded',()=>App.init());
+const App = {
+  async init() {
+    API.init();
+    Router.init();
+    Shop.init();
+
+    await Auth.init();
+    await Presence.init();
+
+    Profile.init();
+    World.init();
+    Match.init();
+    Friends.render();
+    Messages.init();
+    Settings.init();
+    Notifications.init();
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => null);
+    }
+  }
+};
+
+document.addEventListener("DOMContentLoaded", () => App.init());

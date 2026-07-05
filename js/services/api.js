@@ -1,3 +1,6 @@
+// Hubix v6 API additions.
+// This file keeps all previous Hubix API functions and adds dedicated friend conversations.
+
 const API = {
   client: null,
   ready: false,
@@ -59,25 +62,43 @@ const API = {
     const { data, error } = await this.client.auth.signUp({ email, password });
     if (error) throw error;
     if (!data.user) throw new Error("Confirme ton email puis connecte-toi.");
+
     let avatar_url = null;
     if (avatarFile) avatar_url = await this.uploadAvatar(data.user.id, avatarFile);
-    const row = { id: data.user.id, email, pseudo, bio: bio || "Membre Hubix.", age: Number(age) || 18, country: country || "France", lang: "Français", gender: "Peu importe", goals: ["Discuter"], avatar_url };
+
+    const row = {
+      id: data.user.id,
+      email,
+      pseudo,
+      bio: bio || "Membre Hubix.",
+      age: Number(age) || 18,
+      country: country || "France",
+      lang: "Français",
+      gender: "Peu importe",
+      goals: ["Discuter"],
+      avatar_url
+    };
+
     const ins = await this.client.from("profiles").insert(row).select().maybeSingle();
     if (ins.error) throw ins.error;
+
     await this.setPresence(data.user.id, true, "register");
     return this.profile(ins.data || row);
   },
 
   async signIn({ identifier, password }) {
     let email = identifier.trim().toLowerCase();
+
     if (!email.includes("@")) {
       const r = await this.client.from("profiles").select("email").eq("pseudo", identifier.trim()).maybeSingle();
       if (r.error) throw r.error;
       if (!r.data?.email) throw new Error("Pseudo introuvable.");
       email = r.data.email;
     }
+
     const { data, error } = await this.client.auth.signInWithPassword({ email, password });
     if (error) throw error;
+
     const p = await this.getProfile(data.user.id);
     await this.setPresence(p.id, true, "login");
     return p;
@@ -89,8 +110,16 @@ const API = {
   },
 
   async updateProfile(p, file) {
-    const up = { pseudo: p.pseudo, bio: p.bio, age: Number(p.age) || 18, country: p.country || "France", status: p.status || "En ligne", updated_at: new Date().toISOString() };
+    const up = {
+      pseudo: p.pseudo,
+      bio: p.bio,
+      age: Number(p.age) || 18,
+      country: p.country || "France",
+      status: p.status || "En ligne",
+      updated_at: new Date().toISOString()
+    };
     if (file) up.avatar_url = await this.uploadAvatar(p.id, file);
+
     const r = await this.client.from("profiles").update(up).eq("id", p.id).select().maybeSingle();
     if (r.error) throw r.error;
     return this.profile(r.data);
@@ -192,14 +221,6 @@ const API = {
     return this.client.channel(`private_${matchId}`).on("postgres_changes", { event: "INSERT", schema: "public", table: "private_messages", filter: `match_id=eq.${matchId}` }, cb).subscribe();
   },
 
-  async openFriendChat(friendId) {
-    const friend = await this.getProfile(friendId);
-    const match = await this.getOrCreateMatch(Auth.user.id, friendId, 95);
-    friend.match_id = match.id;
-    friend.compatibility = 95;
-    return friend;
-  },
-
   async sendFriendRequest(senderId, receiverId) {
     if (senderId === receiverId) throw new Error("Impossible de t'ajouter toi-même.");
     const existing = await this.client.from("friend_requests").select("*").or(`and(sender_id.eq.${senderId},receiver_id.eq.${receiverId}),and(sender_id.eq.${receiverId},receiver_id.eq.${senderId})`).limit(1);
@@ -230,7 +251,6 @@ const API = {
       { user_id: req.data.sender_id, friend_id: req.data.receiver_id },
       { user_id: req.data.receiver_id, friend_id: req.data.sender_id }
     ]);
-    await this.getOrCreateMatch(req.data.sender_id, req.data.receiver_id, 95);
   },
 
   async refuseFriendRequest(requestId) {
@@ -247,6 +267,53 @@ const API = {
     const r = await this.client.from(table).select(`${col}, profiles!${col}(*)`).eq("user_id", userId);
     if (r.error) return [];
     return (r.data || []).map(x => this.profile(x.profiles)).filter(Boolean);
+  },
+
+  async getOrCreateFriendConversation(userA, userB) {
+    const existing = await this.client.from("friend_conversations")
+      .select("*")
+      .or(`and(user_a.eq.${userA},user_b.eq.${userB}),and(user_a.eq.${userB},user_b.eq.${userA})`)
+      .limit(1);
+    if (existing.error) throw existing.error;
+    if (existing.data?.[0]) return existing.data[0];
+    const created = await this.client.from("friend_conversations").insert({ user_a: userA, user_b: userB }).select().maybeSingle();
+    if (created.error) throw created.error;
+    return created.data;
+  },
+
+  async listFriendConversations(userId) {
+    const r = await this.client.from("friend_conversations").select("*").or(`user_a.eq.${userId},user_b.eq.${userId}`).order("updated_at", { ascending: false });
+    if (r.error) throw r.error;
+    const conversations = [];
+    for (const conv of r.data || []) {
+      const otherId = conv.user_a === userId ? conv.user_b : conv.user_a;
+      const other = await this.getProfile(otherId);
+      conversations.push({ ...conv, other });
+    }
+    return conversations;
+  },
+
+  async listFriendMessages(conversationId) {
+    const r = await this.client.from("friend_messages")
+      .select("*,profiles!sender_id(pseudo,avatar_url)")
+      .eq("conversation_id", conversationId)
+      .is("deleted_at", null)
+      .order("created_at", { ascending: true })
+      .limit(200);
+    if (r.error) throw r.error;
+    return r.data || [];
+  },
+
+  async sendFriendMessage(conversationId, senderId, body) {
+    const r = await this.client.from("friend_messages").insert({ conversation_id: conversationId, sender_id: senderId, body });
+    if (r.error) throw r.error;
+    await this.client.from("friend_conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId);
+  },
+
+  subFriendMessages(conversationId, cb) {
+    return this.client.channel(`friend_messages_${conversationId}`)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "friend_messages", filter: `conversation_id=eq.${conversationId}` }, cb)
+      .subscribe();
   },
 
   async notifyList(uid) {
