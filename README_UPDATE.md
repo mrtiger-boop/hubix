@@ -1,15 +1,21 @@
-# Hubix v2.2 — Real Online Prep
+# Hubix v4.0.1 — Public Online UPDATE
 
-## Installation
-Copie ces fichiers dans ton dossier Hubix v2.1 et remplace.
+Objectif : rendre Hubix vraiment public et synchronisé.
 
-## Changements
-- Suppression des faux profils/bots
-- Suppression des réponses automatiques dans le chat Voisin
-- Le match cherche uniquement des vrais comptes créés localement
-- Le chat mondial ne contient plus de message bot
-- Ajout dossier `supabase/schema.sql`
-- Ajout guide `docs/MISE_EN_LIGNE.md`
+## À remplacer
+- `js/services/supabase-service.js`
+- `js/auth/auth.js`
+- `js/match/match.js`
+- `js/world/world.js`
+- `js/friends/friends.js`
+- `js/app.js`
 
-## Important
-Pour un vrai site en ligne, la prochaine étape est de brancher Supabase ou un backend temps réel.
+## À lancer dans Supabase
+- `supabase/v4_0_1_public_online.sql`
+
+## Après remplacement
+```bash
+git add .
+git commit -m "Hubix v4.0.1 public online"
+git push
+```

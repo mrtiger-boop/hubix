@@ -1,6 +1,7 @@
 const World = {
   lang: "Français",
   server: 1,
+  subscription: null,
 
   init() {
     document.querySelectorAll(".lang").forEach(button => {
@@ -12,7 +13,6 @@ const World = {
         this.render();
       });
     });
-
     document.querySelectorAll(".world-server").forEach(box => {
       box.addEventListener("click", () => {
         this.server = Number(box.dataset.server);
@@ -21,62 +21,56 @@ const World = {
         this.render();
       });
     });
-
     DOM.el("sendWorldBtn")?.addEventListener("click", () => this.send());
-    DOM.el("worldInput")?.addEventListener("keydown", event => {
-      if (event.key === "Enter") this.send();
-    });
-
+    DOM.el("worldInput")?.addEventListener("keydown", e => { if (e.key === "Enter") this.send(); });
     this.render();
   },
 
-  key() {
-    return `world_${this.lang}_${this.server}`;
-  },
+  key() { return `world_${this.lang}_${this.server}`; },
 
   updateNames() {
-    ["One", "Two", "Three"].forEach((name, index) => {
-      DOM.text("world" + name, `${this.lang} #${index + 1}`);
-    });
+    ["One","Two","Three"].forEach((name,i) => DOM.text("world"+name, `${this.lang} #${i+1}`));
+  },
+
+  messageHTML(m) {
+    const pseudo = m.profiles?.pseudo || m.author || "Utilisateur";
+    const body = m.body || m.text || "";
+    const image = m.image_url ? `<br><img class="chat-image" src="${m.image_url}">` : "";
+    return `<div class="bubble"><b>${pseudo}</b>${body}${image}</div>`;
   },
 
   async render() {
     DOM.text("worldTitle", `🌍 ${this.lang} #${this.server}`);
+    if (this.subscription) { this.subscription.unsubscribe?.(); this.subscription = null; }
 
     if (HubixOnline.ready) {
       try {
         const messages = await HubixOnline.listWorldMessages(this.lang, this.server);
-        DOM.html("worldMessages", messages.length ? messages.map(message => `
-          <div class="bubble"><b>${message.profiles?.pseudo || "Utilisateur"}</b>${message.body}</div>
-        `).join("") : `<p class="muted">Aucun message.</p>`);
+        DOM.html("worldMessages", messages.length ? messages.map(m => this.messageHTML(m)).join("") : `<p class="muted">Aucun message.</p>`);
+        this.subscription = HubixOnline.subscribeWorldMessages(this.lang, this.server, async () => {
+          const fresh = await HubixOnline.listWorldMessages(this.lang, this.server);
+          DOM.html("worldMessages", fresh.length ? fresh.map(m => this.messageHTML(m)).join("") : `<p class="muted">Aucun message.</p>`);
+          const box = DOM.el("worldMessages"); if (box) box.scrollTop = box.scrollHeight;
+        });
         return;
-      } catch (error) {
-        console.warn(error);
-      }
+      } catch (e) { console.warn(e); }
     }
 
     const messages = HubixLocal.get(this.key(), []);
-    DOM.html("worldMessages", messages.length ? messages.map(message => `
-      <div class="bubble"><b>${message.author}</b>${message.text}</div>
-    `).join("") : `<p class="muted">Aucun message.</p>`);
+    DOM.html("worldMessages", messages.length ? messages.map(m => this.messageHTML(m)).join("") : `<p class="muted">Aucun message.</p>`);
   },
 
   async send() {
     const input = DOM.el("worldInput");
     const text = input.value.trim();
     if (!text) return;
-
     if (HubixOnline.ready && Auth.user) {
       try {
         await HubixOnline.sendWorldMessage(this.lang, this.server, Auth.user.id, text);
         input.value = "";
-        await this.render();
         return;
-      } catch (error) {
-        alert(error.message || "Erreur message mondial.");
-      }
+      } catch (e) { alert(e.message || "Erreur message mondial."); }
     }
-
     const messages = HubixLocal.get(this.key(), []);
     messages.push({ author: Auth.user?.pseudo || "Moi", text });
     HubixLocal.set(this.key(), messages);
