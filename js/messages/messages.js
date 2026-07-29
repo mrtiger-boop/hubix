@@ -22,7 +22,7 @@ const Messages = {
     if (!box) return;
 
     if (!API.ready || !Auth.user) {
-      box.innerHTML = "<p class='muted'>Connecte-toi.</p>";
+      box.innerHTML = "<div class='empty-state'><span class='icon'>🔒</span>Connecte-toi pour voir tes messages.</div>";
       return;
     }
 
@@ -31,11 +31,11 @@ const Messages = {
     box.innerHTML = conversations.length
       ? conversations.map(conversation => `
         <button class="conversation-btn" onclick="Messages.open('${conversation.id}')">
-          ${conversation.other?.avatar_url ? `<img src="${conversation.other.avatar_url}" class="avatar-img">` : "👤"}
+          <span class="avatar-sm">${conversation.other?.avatar_url ? `<img src="${conversation.other.avatar_url}" alt="">` : "👤"}</span>
           <span>${conversation.other?.pseudo || "Utilisateur"}</span>
         </button>
       `).join("")
-      : "<p class='muted'>Aucune conversation.</p>";
+      : "<div class='empty-state'><span class='icon'>💬</span>Aucune conversation. Ajoute des amis pour commencer !</div>";
   },
 
   async open(conversationId) {

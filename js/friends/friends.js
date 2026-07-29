@@ -5,7 +5,7 @@ const Friends = {
     const blockedList = DOM.el("blockedList");
 
     if (!API.ready || !Auth.user) {
-      if (friendList) friendList.innerHTML = "<p class='muted'>Connecte-toi.</p>";
+      if (friendList) friendList.innerHTML = "<div class='card empty-state'><span class='icon'>🔒</span>Connecte-toi pour voir tes amis.</div>";
       return;
     }
 
@@ -21,7 +21,7 @@ const Friends = {
           ${this.requests(requests)}
         </div>
         <h2>Mes amis</h2>
-        <div class="grid">${this.friendsList(friends)}</div>
+        <div class="card">${this.friendsList(friends)}</div>
       `;
     }
 
@@ -31,31 +31,45 @@ const Friends = {
     DOM.text("statFriends", friends.length);
   },
 
+  avatarHTML(person) {
+    return person.avatar_url
+      ? `<img src="${person.avatar_url}" alt="">`
+      : (person.pseudo?.[0]?.toUpperCase() || "?");
+  },
+
   simpleList(items) {
     return items.length
       ? items.map(person => `
-        <div class="card">
-          <b>${person.pseudo}</b>
-          <p>${person.age} ans • ${person.country}</p>
+        <div class="card entity-card">
+          <div class="avatar-sm">${this.avatarHTML(person)}</div>
+          <div class="entity-info">
+            <b>${person.pseudo}</b>
+            <p>${person.age} ans • ${person.country}</p>
+          </div>
         </div>
       `).join("")
-      : "<p class='muted'>Aucun.</p>";
+      : "<div class='empty-state'><span class='icon'>🫥</span>Aucun profil ici pour l'instant.</div>";
   },
 
   friendsList(items) {
     return items.length
       ? items.map(person => `
-        <div class="card">
-          <b>${person.pseudo}</b>
-          <p>${person.age} ans • ${person.country}</p>
-          <button class="btn" onclick="Friends.openMessages('${person.id}')">💬 Message privé</button>
-          <button class="btn ghost" onclick="Friends.comingSoon('Appel audio')">📞 Audio</button>
-          <button class="btn ghost" onclick="Friends.comingSoon('Appel vidéo')">🎥 Vidéo</button>
-          <button class="btn ghost" onclick="Friends.comingSoon('Photo')">📷 Photo</button>
-          <button class="btn ghost" onclick="Friends.comingSoon('Cadeau')">🎁 Cadeau</button>
+        <div class="entity-card">
+          <div class="avatar-sm">${this.avatarHTML(person)}</div>
+          <div class="entity-info">
+            <b>${person.pseudo}</b>
+            <p>${person.age} ans • ${person.country}</p>
+          </div>
+          <div class="entity-actions">
+            <button class="btn" onclick="Friends.openMessages('${person.id}')">💬 Message</button>
+            <button class="btn ghost" onclick="Friends.comingSoon('Appel audio')">📞 Audio</button>
+            <button class="btn ghost" onclick="Friends.comingSoon('Appel vidéo')">🎥 Vidéo</button>
+            <button class="btn ghost" onclick="Friends.comingSoon('Photo')">📷 Photo</button>
+            <button class="btn ghost" onclick="Friends.comingSoon('Cadeau')">🎁 Cadeau</button>
+          </div>
         </div>
       `).join("")
-      : "<p class='muted'>Aucun ami.</p>";
+      : "<div class='empty-state'><span class='icon'>👥</span>Aucun ami pour l'instant. Lance un Match pour en trouver !</div>";
   },
 
   requests(items) {
@@ -63,15 +77,20 @@ const Friends = {
       ? items.map(request => {
         const sender = API.profile(request.sender);
         return `
-          <div class="card">
-            <b>${sender.pseudo}</b>
-            <p>veut t'ajouter en ami.</p>
-            <button class="btn" onclick="Friends.accept('${request.id}')">✅ Accepter</button>
-            <button class="btn ghost" onclick="Friends.refuse('${request.id}')">❌ Refuser</button>
+          <div class="entity-card">
+            <div class="avatar-sm">${this.avatarHTML(sender)}</div>
+            <div class="entity-info">
+              <b>${sender.pseudo}</b>
+              <p>veut t'ajouter en ami</p>
+            </div>
+            <div class="entity-actions">
+              <button class="btn" onclick="Friends.accept('${request.id}')">✅ Accepter</button>
+              <button class="btn ghost" onclick="Friends.refuse('${request.id}')">❌ Refuser</button>
+            </div>
           </div>
         `;
       }).join("")
-      : "<p class='muted'>Aucune demande.</p>";
+      : "<p class='muted'>Aucune demande en attente.</p>";
   },
 
   async accept(requestId) {
